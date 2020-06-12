@@ -1,5 +1,9 @@
 # Binocular Energy Model
 
+### Version
+
+Version 1.0.0  --  18 October 2019
+
 ### Authors
 
 Ivan Alvarez (University of Oxford)  

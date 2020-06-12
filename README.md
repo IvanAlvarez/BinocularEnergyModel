@@ -2,17 +2,14 @@
 
 ### Authors
 
-Ivan Alvarez (University of Oxford) 
+Ivan Alvarez (University of Oxford)  
 Marcus Daghlian (University of Oxford)  
 
 ### About
 
 Matlab implementation of the binocular energy model (BEM) for binocular disparity detection in V1 complex cells.  
 
-The principal model is based on Ohzawa et al. (1990), with additional details drawn from Henriksen et al. (2016). Binocular disparity encoding by position shift and phase shift is based on Fleet et al. (1996). The default parameters used for receptive field definitions are based on data from Cumming & Parker (2000), Nienborg et al. (2004), Prince et al. (2002a, 2002b) and Ringach (2003).  
-
-Population receptive field (pRF) modelling of BEM outputs is inspired by the original model proposed for fMRI signals in Dumoulin 
-& Wandell (2008), and closely matched to previous implementations detailed in Alvarez et al. (2015).  
+The principal model is based on Ohzawa et al. (1990), with additional details drawn from Henriksen et al. (2016). Binocular disparity encoding by position shift and phase shift is based on Fleet et al. (1996). The default parameters used for receptive field definitions are based on data from Cumming & Parker (2000), Nienborg et al. (2004), Prince et al. (2002a, 2002b) and Ringach (2003).  Population receptive field (pRF) modelling of BEM outputs is inspired by the original model proposed for fMRI signals in Dumoulin & Wandell (2008), and closely matched to previous implementations detailed in Alvarez et al. (2015).  
 
 ## List of functions
 
@@ -46,7 +43,7 @@ BEM_gabor ---- Make a 2D Gabor filter
 BEM_gaussian ---- Make a 2D multivariate Gaussian filter  
 BEM_grating ---- Make a 2D sinusoidal grating  
 BEM_howlong ---- Estimate how long a model will take to run  
-BEM_maxresponse ---- Estimate maximum possible response for a given cell
+BEM_maxresponse ---- Estimate maximum possible response for a given cell  
 BEM_parpool ---- Create or query the Matlab parallel pool  
 BEM_radialcheck ---- Make a radial checkerboard image  
 BEM_rectify ---- Signal rectification functions

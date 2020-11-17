@@ -20,9 +20,7 @@ function [Simple, Complex] = BEM_run_parallel(Parameters, Stimulus, CellPop)
 % variables.
 %
 % This version exploits parallel threading in Matlab, when available.
-% Note: If a waitbar is requested, this script requires the ParforProgMon
-% toolbox (https://github.com/DylanMuir/ParforProgMon).
-
+%
 % Changelog
 % 28/06/2018    Written
 % 12/07/2018    Removed waitbar for cluster use
@@ -34,6 +32,7 @@ function [Simple, Complex] = BEM_run_parallel(Parameters, Stimulus, CellPop)
 % 05/09/2018    Half-squaring now done with BEM_rectify
 % 11/06/2019    Segregated stimulus frames and aperture positions
 %               Fixed stimulus vectorisation
+% 17/11/2020    Dropped ParforProgMon dependency
 
 %% Input
 
@@ -80,13 +79,6 @@ Nconv = numel(Gx);
 %  (3) If not requested, disable parallel pooling
 Poolobj = BEM_parpool(Parameters);
 
-%% Open UI
-
-% Open
-if Parameters.ParallelPool && Parameters.Waitbar
-    ppm = ParforProgMon('Convolving...', Nconv);
-end
-
 %% Vectorise stimulus
 
 % Vectorise image dimension
@@ -132,11 +124,6 @@ parfor (i = 1:Nconv, Poolobj.NumWorkers)
     
     % Store
     SS(i, :) = vLR;    
-    
-    % Update UI
-    if Parameters.ParallelPool && Parameters.Waitbar
-        ppm.increment();
-    end
 end
 
 %% Reshape data

@@ -7,20 +7,21 @@ function Poolobj = BEM_parpool(Parameters)
 % Output
 %   Poolobj      [handle] Parallel pool handle
 %
-% If a parallel pool is requested in Parameters.ParallelPool and the system
-% allows it, create a parallel pool.
-% If a pool already exists in the current session, return the handle.
-
+% Three options:
+%  (1) If a parallel pool is present, return the handle
+%  (2) If no parallel pool present, create one and return the handle
+%  (3) If not requested, return a dummy handle
+%
 % Changelog
 % 02/07/2018    Written
 % 12/07/2018    Better handling when parallel pool is disabled
-%
+% 17/11/2020    Create dummy pool
 
 %% Main
 
 % Optional
 if Parameters.ParallelPool
- 
+    
     % Is there a current pool?
     Poolobj = gcp('NoCreate');
     
@@ -41,8 +42,9 @@ else
     Ps = parallel.Settings;
     Ps.Pool.AutoCreate = false;
     
-    % No parallel pool
-    Poolobj = [];
+    % Make dummy parallel pool
+    Poolobj = struct;
+    Poolobj.NumWorkers = 0;
 end
 
 % Done

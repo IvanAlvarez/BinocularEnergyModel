@@ -13,11 +13,13 @@ function ModelFit = BEM_prffit4(Parameters, Aperture, Timeseries)
 % over time, fit a 4-parameter population receptive field (pRF) model and 
 % return the model parameters. The four parameters are pRF location (X,Y),
 % pRF size (Sigma) and response amplitude (Beta). 
-
+%
+% Exploit parallel threading in Matlab, when requested & available.
+%
 % Changelog
 % 26/06/2019    Written
 % 08/07/2019    Split into 2- and 4-parameter versions
-%
+% 17/11/2020    Added parallel support
 
 %% Input
 
@@ -34,17 +36,33 @@ Parameters = BEM_convertunit('deg2pix', Parameters);
 % fminsearch options
 SearchOpts = optimset('TolX', 1e-2, 'TolFun', 1e-2, 'Display', 'off');
 
-%% Search grid
+% Pull single parameter out
+PixPerDeg = Parameters.PixPerDeg;
 
-% Generate search grid
-[X, Rf] = BEM_prfsearchgrid(Parameters);
+% Number of timeseries to fit
+Nfits = length(Timeseries);
 
 %% Open UI
 
 % Open
-if Parameters.Waitbar   
+if Parameters.Waitbar && ~Parameters.ParallelPool
     wb = waitbar(0, 'prf fit...');
+else
+    wb = [];
 end
+
+%% Parallelisation
+
+% Obtain parallel pool. The following options are available:
+%  (1) If parallel pool present, use it
+%  (2) If no parallel pool present, create one
+%  (3) If not requested, disable parallel pooling
+Poolobj = BEM_parpool(Parameters);
+
+%% Search grid
+
+% Generate search grid
+[X, Rf] = BEM_prfsearchgrid(Parameters);
 
 %% Main
 
@@ -52,7 +70,7 @@ end
 ModelFit = struct;
 
 % Loop timeseries
-for i = 1 : length(Timeseries)
+parfor (i = 1 : Nfits, Poolobj.NumWorkers)
 
     % Pull signal
     Y = Timeseries(i).Response;
@@ -80,7 +98,7 @@ for i = 1 : length(Timeseries)
     R2 = 1 - (SSE ./ SST);
     
     % Convert fit parameters from pixels to degrees
-    Fit(1:3) = Fit(1:3) / Parameters.PixPerDeg;
+    Fit(1:3) = Fit(1:3) / PixPerDeg;
     
     % Store
     ModelFit(i).Cell = Timeseries(i).Cell;
@@ -93,15 +111,16 @@ for i = 1 : length(Timeseries)
     ModelFit(i).R2 = R2;
     
     % Update UI
-    if Parameters.Waitbar
-        waitbar(i / length(Timeseries), wb);
+    if ~isempty(wb)
+        waitbar(i / Nfits, wb);
     end
+
 end
 
 %% Close UI
 
 % Close
-if Parameters.Waitbar
+if ~isempty(wb)
     close(wb);
 end
 

@@ -6,8 +6,11 @@ function [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, Do
 %   Disparity    [vector] Desired binocular disparity, pixels
 %   DotRadius    [scalar] Radius of the dots, pixels
 %   DotNum       [scalar] Number of dots
-%   DotColor     [string] 'monotone' background = 0, dots = 1
-%                         'bw' backgrouns = 0, dots = -1/+1 
+%   DotColor     [string] 'monotone' no-dots = 0, dots = 1
+%                         'bw'       no-dots = 0, dots = -1/+1 
+%                [cellar] If the input is a cell array, the first string
+%                         is for foreground dots and the second for
+%                         background dots
 %   Background   [string] 'correlated' background dots match LE & RE
 %                         'uncorrelated' background dots do not match
 % Output
@@ -36,9 +39,11 @@ function [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, Do
 % 17/09/2018    Made disparity shift direction consistent with other
 %               options in BEM_make_stimulus
 % 11/06/2019    Added dot color option
+% 16/01/2021    Added differential specification of dot color for
+%               foreground and background
 %
 
-%% Calculate dot positions
+%% Calculate dot positions and colours
 
 % Infer image size from aperture
 ImSize = size(Aperture);
@@ -58,8 +63,20 @@ yBack{1} = randi(Clearance, [DotNum 1]);
 xBack{2} = randi(Clearance, [DotNum 1]);
 yBack{2} = randi(Clearance, [DotNum 1]);
 
+% Parse dot colour input
+if ischar(DotColor)
+    % If a single dot colour option is specified, use for both foreground
+    % and background
+    DotColorFore = DotColor;
+    DotColorBack = DotColor;
+else
+    % Different specification for foreground and background dot color
+    DotColorFore = DotColor{1};
+    DotColorBack = DotColor{2};
+end
+
 % Background random dot colour, one for each eye
-switch DotColor
+switch DotColorBack
     case 'monotone'
         cBack{1} = ones(DotNum, 1);
         cBack{2} = ones(DotNum, 1);
@@ -84,9 +101,8 @@ end
 xFore = randi(Clearance, [DotNum 1]);
 yFore = randi(Clearance, [DotNum 1]);
 
-
 % Foreground dot colour
-switch DotColor
+switch DotColorFore
     case 'monotone'
         cFore = ones(DotNum, 1);
     case 'bw'

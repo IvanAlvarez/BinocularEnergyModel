@@ -62,7 +62,7 @@ if ~isempty(Parameters)
     % Stimulus parameters
     Parameters.Stim.Disparity =        Parameters.Stim.Disparity * CF;
     Parameters.Stim.GratingSF =        Parameters.Stim.GratingSF * (1 / CF); % cycles per degree / cycles per pixel
-    Parameters.Stim.RandotDotRadius =  Parameters.Stim.RandotDotRadius * CF;
+    Parameters.Stim.Randot.DotRadius = Parameters.Stim.Randot.DotRadius * CF;
     Parameters.Stim.ApertureBarWidth = Parameters.Stim.ApertureBarWidth * CF;
     
     % Receptive field parameters    

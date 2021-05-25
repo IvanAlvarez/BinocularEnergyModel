@@ -25,6 +25,7 @@ function Parameters = BEM_parameters
 % 23/07/2019    Added radial checkerboard stimulus options
 % 18/10/2019    Added monochrome stimulus type
 % 25/05/2021    Added wedge aperture type
+%               Made randot dot color and correlation explicitly stated
 %
 
 %% Startup
@@ -95,8 +96,10 @@ Parameters.Stim.MonochromeCol = 1;   % Grayscale value inside aperture, 0-1
 % Random dot stimulus
 Parameters.Stim.RandotDotRadius = 0.2;             % Dot radius, degVA
 Parameters.Stim.RandotDotNum = 500;                % Number of dots
-Parameters.Stim.RandotDotColor = 'bw';             % monotone, bw
-Parameters.Stim.RandotBackground = 'uncorrelated'; % correlated, uncorrelated
+Parameters.Stim.Randot.ForegroundDotColor = 'bw';  % monotone, bw
+Parameters.Stim.Randot.BackgroundDotColor = 'bw';  % monotone, bw
+Parameters.Stim.Randot.ForegroundDotCorrelation = 'correlated';  % correlated, uncorrelated, anticorrelated
+Parameters.Stim.Randot.BackgroundDotCorrelation = 'uncorrelated';  % correlated, uncorrelated, anticorrelated
 
 % Linear checkerboard stimulus
 Parameters.Stim.LinCheckNum = 300;     % Number of checkers, total 

@@ -1,18 +1,26 @@
-function [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, DotColor, Background)
-% [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, DotColor, Background)
+function [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, ForeDotColor, BackDotColor, ForeDotCorr, BackDotCorr)
+% [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, ForeDotColor, BackDotColor, ForeDotCorr, BackDotCorr)
 %
 % Inputs
 %   Aperture     [scalar] Binary image showing disparity target location
 %   Disparity    [vector] Desired binocular disparity, pixels
 %   DotRadius    [scalar] Radius of the dots, pixels
 %   DotNum       [scalar] Number of dots
-%   DotColor     [string] 'monotone' no-dots = 0, dots = 1
-%                         'bw'       no-dots = 0, dots = -1/+1 
-%                [cellar] If the input is a cell array, the first string
-%                         is for foreground dots and the second for
-%                         background dots
-%   Background   [string] 'correlated' background dots match LE & RE
-%                         'uncorrelated' background dots do not match
+%   ForeDotColor [string] Color of dots inside the aperture
+%                           'monotone' = +1
+%                           'bw' = -1/+1, split half-and-half
+%   BackDotColor [string] Color of dots outside the aperture
+%                           'monotone' = +1
+%                           'bw' = -1/+1, split half-and-half
+%   ForeDotCorr  [string] Correlation of dots inside the aperture
+%                           'correlated' = same color, same position
+%                           'uncorrelated' = same color, different position
+%                           'anticorrelated' = same position, opposite color
+%   BackDotCorr  [string] Correlation of dots outside the aperture
+%                           'correlated' = same color, same position
+%                           'uncorrelated' = same color, different position
+%                           'anticorrelated' = same position, opposite color
+%
 % Output
 %   ImL          [matrix] m x n x d, where m x n are stimulus images,
 %                         and d are disparities
@@ -20,7 +28,7 @@ function [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, Do
 %
 % Given a binary aperture image, create a random dot image pair where
 % binocular disparity has been added within the positive zone of the
-% aperture image. 
+% aperture image. Non-dot background is always 0.
 
 % Changelog
 % 08/06/2018    Written
@@ -41,9 +49,11 @@ function [ImL, ImR] = BEM_stim_randot(Aperture, Disparity, DotRadius, DotNum, Do
 % 11/06/2019    Added dot color option
 % 16/01/2021    Added differential specification of dot color for
 %               foreground and background
+% 25/05/2021    Explicit and independent specification of dot color and dot
+%               correlation for both foreground and background dots 
 %
 
-%% Calculate dot positions and colours
+%% Settings
 
 % Infer image size from aperture
 ImSize = size(Aperture);
@@ -57,26 +67,16 @@ DispNum = length(Disparity);
 % Horizontal clearance to make sure dots don't fall off the edge of the image
 Clearance = round([DotRadius, ImSize(1) - DotRadius]);
 
-% Background random dot positions, one for each eye
+%% Background dots position & color
+
+% Background dot positions, randomised independently for each eye
 xBack{1} = randi(Clearance, [DotNum 1]);
 yBack{1} = randi(Clearance, [DotNum 1]);
 xBack{2} = randi(Clearance, [DotNum 1]);
 yBack{2} = randi(Clearance, [DotNum 1]);
 
-% Parse dot colour input
-if ischar(DotColor)
-    % If a single dot colour option is specified, use for both foreground
-    % and background
-    DotColorFore = DotColor;
-    DotColorBack = DotColor;
-else
-    % Different specification for foreground and background dot color
-    DotColorFore = DotColor{1};
-    DotColorBack = DotColor{2};
-end
-
-% Background random dot colour, one for each eye
-switch DotColorBack
+% Background dot color
+switch BackDotColor
     case 'monotone'
         cBack{1} = ones(DotNum, 1);
         cBack{2} = ones(DotNum, 1);
@@ -85,32 +85,61 @@ switch DotColorBack
         cBack{2} = randsample([-1 1], DotNum, true)';
 end
 
-% Background dot positions and colours
-switch Background
-    case 'uncorrelated'
-        % Leave as is
-
+% Background dot correlation
+switch BackDotCorr
     case 'correlated'
-        % Copy positions and colours form LE to RE
+        % Copy positions and colours from LE to RE
         xBack{2} = xBack{1};
         yBack{2} = yBack{1};
         cBack{2} = cBack{1};
+    case 'anticorrelated'
+        % Copy positions and colours from LE to RE, invert color
+        xBack{2} = xBack{1};
+        yBack{2} = yBack{1};
+        cBack{2} = -cBack{1};
+    case 'uncorrelated'
+        % Leave as is
 end
 
-% Foreground dot positions
-xFore = randi(Clearance, [DotNum 1]);
-yFore = randi(Clearance, [DotNum 1]);
+%% Foreground dots position & color
 
-% Foreground dot colour
-switch DotColorFore
+% Foreground dot positions, randomised independently for each eye
+xFore{1} = randi(Clearance, [DotNum 1]);
+yFore{1} = randi(Clearance, [DotNum 1]);
+xFore{2} = randi(Clearance, [DotNum 1]);
+yFore{2} = randi(Clearance, [DotNum 1]);
+
+% Foreground dot color
+switch ForeDotColor
     case 'monotone'
-        cFore = ones(DotNum, 1);
+        cFore{1} = ones(DotNum, 1);
+        cFore{2} = ones(DotNum, 1);
     case 'bw'
-        cFore = randsample([-1 1], DotNum, true)';
+        cFore{1} = randsample([-1 1], DotNum, true)';
+        cFore{2} = randsample([-1 1], DotNum, true)';
 end
+
+% Foreground dot correlation
+switch ForeDotCorr
+    case 'correlated'
+        % Copy positions and colours from LE to RE
+        xFore{2} = xFore{1};
+        yFore{2} = yFore{1};
+        cFore{2} = cFore{1};
+    case 'anticorrelated'
+        % Copy positions and colours from LE to RE, invert color
+        xFore{2} = xFore{1};
+        yFore{2} = yFore{1};
+        cFore{2} = -cFore{1};
+    case 'uncorrelated'
+        % Leave as is
+end
+
+%% Add disparity to foreground dots
 
 % Find foreground dots that fall inside aperture
-Inside = ismember([xFore, yFore], [ax ay], 'rows');
+Inside{1} = ismember([xFore{1}, yFore{1}], [ax, ay], 'rows');
+Inside{2} = ismember([xFore{2}, yFore{2}], [ax, ay], 'rows');
 
 % Direction of disparity shift for each eye
 ShiftDir = [-1 +1];
@@ -142,9 +171,9 @@ for d = 1:DispNum
         cb = cBack{e}(~Overlap);
         
         % Shift horizontal position of foreground dots
-        xs = xFore(Inside) + Dshift(e);
-        ys = yFore(Inside);
-        cs = cFore(Inside);
+        xs = xFore{e}(Inside{e}) + Dshift(e);
+        ys = yFore{e}(Inside{e});
+        cs = cFore{e}(Inside{e});
         
         % Discard shifted dots that fall outside the image
         Castaway = xs < Clearance(1) | xs > Clearance(2);
@@ -170,8 +199,9 @@ Dx = Dx - DotRadius;
 Dy = Dy - DotRadius;
 
 % Start with blank images, one frame per disparity
-Im{1} = zeros([ImSize DispNum]);
-Im{2} = zeros([ImSize DispNum]);
+% Set the color to the desired background value 
+Im{1} = ones([ImSize DispNum]);
+Im{2} = ones([ImSize DispNum]);
 
 % Loop eyes & disparities
 for e = 1:2

@@ -41,15 +41,15 @@ C = Complex;
 
 % Summary options
 if Parameters.Prf.AvgCells
-    C = mean(C, 1);
+    C = nanmean(C, 1);
     Cells = {'average'};
 end
 if Parameters.Prf.AvgDisparities
-    C = mean(C, 2);
+    C = nanmean(C, 2);
     Disparity = {'average'};
 end
 if Parameters.Prf.AvgFrames
-    C = mean(C, 4);
+    C = nanmean(C, 4);
     Frames = {'average'};
 end
 

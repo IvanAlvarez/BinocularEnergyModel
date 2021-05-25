@@ -2,12 +2,13 @@
 
 ### Version
 
+Version 1.0.1  --  25 May 2021
 Version 1.0.0  --  18 October 2019
 
 ### Authors
 
-Ivan Alvarez (University of Oxford)  
-Marcus Daghlian (University of Oxford)  
+Ivan Alvarez (University of Oxford)
+with help from Marcus Daghlian (University of Oxford)
 
 ### About
 

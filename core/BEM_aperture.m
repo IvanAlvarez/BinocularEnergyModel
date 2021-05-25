@@ -7,7 +7,9 @@ function Aperture = BEM_aperture(Type, Size, Nsteps, Options)
 %   Nsteps       [scalar] number of aperture steps
 %   Options      [struct]
 %       .BarWidth   [scalar] width of the bar, in pixels
-%       .BarOri     [scalar] lr, up, diag1, diag2
+%       .BarOri     [string] lr, up, diag1, diag2
+%       .WedgeWidth [scalar] width of the wedge, in degrees of unit circle
+%       .WedgeDir   [string] + (clockwise), - (counter-clockwise)
 %
 % Output
 %   Ap           [matrix] m x n x a, where m x n is a binary aperture and 
@@ -16,6 +18,7 @@ function Aperture = BEM_aperture(Type, Size, Nsteps, Options)
 % Changelog
 % 05/06/2019    Written
 % 11/06/2019    Clarified aperture step vs. frame terminology
+% 25/05/2021    Added wedge aperture type
 %
 
 %% Input
@@ -69,6 +72,27 @@ switch Type
                     Aperture(:,:,i) = imrotate(Aperture(:,:,i), -225, 'crop');
             end
         end
+        
+    case 'wedge'
+        
+        %% Rotating wedge aperture
+          
+        % Wedge positions
+        Position = linspace(0, 360 - Options.WedgeWidth, Nsteps);
+        
+        % Flip direction if rotating counter-clockwise
+        if strcmpi(Options.WedgeDir, '-')
+            Position = fliplr(Position);
+        end
+                        
+        % Start with a blank image
+        Aperture = zeros(Size, Size, Nsteps);
+
+        % Create wedge positions
+        for i = 1 : Nsteps
+            Aperture(:,:,i) = BEM_aperture_wedge(Size, Position(i), Options.WedgeWidth, Options.WedgeDir);
+        end
+        
 end
 
 % Convert to logical

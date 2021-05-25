@@ -24,6 +24,7 @@ function Parameters = BEM_parameters
 % 08/07/2019    Added baseline specification for pRF signal normalisation
 % 23/07/2019    Added radial checkerboard stimulus options
 % 18/10/2019    Added monochrome stimulus type
+% 25/05/2021    Added wedge aperture type
 %
 
 %% Startup
@@ -112,6 +113,7 @@ Parameters.Stim.LoadFile = [];
 % Aperture types
 % 'full'      Full-field stimulus
 % 'bar'       Sweeping bar
+% 'wedge'     Rotating wedge
 %
 % Apertures are binary masks added on top of the stimulus generated. Each
 % individual frame is independent.
@@ -124,6 +126,10 @@ Parameters.Stim.Nframes = 1;          % How many frames per aperture step
 % Bar aperture settings
 Parameters.Stim.ApertureBarOri = 'lr'; % ud, lr, diag1, diag2
 Parameters.Stim.ApertureBarWidth = 1; % degVA
+
+% Wedge aperture settings
+Parameters.Stim.ApertureWedgeWidth = 20; % degrees of unit circle
+Parameters.Stim.ApertureWedgeDir = '+'; % + (clockwise), - (counter-clockwise)
 
 % Force monocular stimulus (only present LE)
 Parameters.Stim.Monocular = false;

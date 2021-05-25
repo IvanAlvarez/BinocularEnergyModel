@@ -30,6 +30,7 @@ function [Stimulus, Aperture] = BEM_make_stimulus(Parameters)
 % 28/08/2019    Added linear checkerboard stimulus
 % 29/08/2019    Enforce single-digit precision at pre-allocation point
 % 18/10/2019    Added monochrome stimulus type
+% 25/05/2021    Added wedge aperture type
 %
 
 %% Input
@@ -60,6 +61,8 @@ end
 % Define aperture options struct
 Options.BarWidth = Parameters.Stim.ApertureBarWidth;
 Options.BarOri = Parameters.Stim.ApertureBarOri;
+Options.WedgeWidth = Parameters.Stim.ApertureWedgeWidth;
+Options.WedgeDir = Parameters.Stim.ApertureWedgeDir;
 
 % Make aperture
 Aperture = BEM_aperture(Parameters.Stim.Aperture, ...
